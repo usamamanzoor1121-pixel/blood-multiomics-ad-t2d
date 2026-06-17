@@ -1,0 +1,154 @@
+# ============================================================
+# params.yaml — Single source of truth for all pipeline parameters
+# Blood Multi-Omics AD × T2D | Usama Manzoor | 2026
+# ============================================================
+
+# ── DATA ────────────────────────────────────────────────────
+data:
+  ad:
+    geo_accessions:
+      - GSE63060
+      - GSE63061
+      - GSE97760
+      - GSE140831
+    n_ad: 287
+    n_mci: 238
+    n_control: 394
+    array_platform: "Illumina HumanHT-12 BeadChip"
+    methylation_platform: "Illumina 450k"
+
+  t2d:
+    geo_accessions:
+      - GSE221521
+      - GSE166117
+    n_t2d: 509
+    n_prediabetic: 180
+    n_control: 501
+    sequencing_platform: "Illumina NovaSeq 6000"
+    methylation_platform: "EPIC 850k"
+
+# ── DIFFERENTIAL EXPRESSION ─────────────────────────────────
+deg:
+  padj_threshold: 0.05
+  log2fc_threshold: 1.0
+  min_counts: 10
+  normalization: "VST"          # DESeq2 variance stabilising transformation
+  batch_correction: true
+  combat_method: "ComBat-seq"
+
+# ── DNA METHYLATION ─────────────────────────────────────────
+methylation:
+  delta_beta_threshold: 0.15    # |dBeta| cutoff for blood (lower than tissue)
+  fdr_threshold: 0.05
+  platform_ad: "450k"
+  platform_t2d: "EPIC_850k"
+  cpg_annotation: "Illumina_manifest"
+
+# ── BIRTHS SCORE (T2DM blood biomarker) ─────────────────────
+births:
+  stress_genes:
+    - "S100A8"
+    - "S100A9"
+    - "TXNIP"
+    - "IL1B"
+    - "NLRP3"
+    - "CCL2"
+  protective_genes:
+    - "IRS1"
+    - "PPARGC1A"
+    - "ADIPOR1"
+    - "IL10"
+    - "FOXO1"
+    - "TFAM"
+  normalization_range: [0, 100]
+  thresholds:
+    low_ir: 40        # BIRTHS < 40 = Low-IR subtype
+    mid_ir: 65        # BIRTHS 40–65 = Mid-IR subtype
+    high_ir: 65       # BIRTHS > 65 = High-IR subtype
+
+# ── BRS SCORE (AD blood biomarker) ──────────────────────────
+brs:
+  weights:
+    nfl: 0.30
+    gfap: 0.25
+    ptau217: 0.25
+    rf_probability: 0.20
+  thresholds:
+    control_upper: 35
+    mci_lower: 35
+    mci_upper: 58
+    ad_lower: 58
+
+# ── MACHINE LEARNING ─────────────────────────────────────────
+ml:
+  test_size: 0.20
+  random_state: 42
+  cv_folds: 5
+  stratified: true
+  n_top_genes: 500          # Feature selection: top N genes by variance
+                             # CRITICAL: selection is computed on TRAINING SET ONLY
+                             # (see scripts/06_ml_pipeline/ml_classifier.py)
+  models:
+    - random_forest
+    - svm_rbf
+    - gradient_boosting
+    - mlp
+    - lasso_logistic
+  hyperparams:
+    random_forest:
+      n_estimators: 500
+      max_depth: null
+      min_samples_leaf: 2
+    gradient_boosting:
+      n_estimators: 300
+      learning_rate: 0.05
+      max_depth: 5
+      subsample: 0.8
+    mlp:
+      hidden_layers: [256, 128, 64]
+      dropout: 0.3
+      epochs: 100
+      batch_size: 32
+    svm_rbf:
+      C: 1.0
+      gamma: "scale"
+  shap:
+    enabled: true
+    n_background: 100
+    max_display: 25
+
+# ── PPI NETWORK ──────────────────────────────────────────────
+network:
+  string_confidence_threshold: 0.700
+  hub_ranking_method: "degree"
+  min_hub_degree: 5
+  cross_disease_concordance_threshold: 0.70
+
+# ── CROSS-DISEASE ─────────────────────────────────────────────
+cross_disease:
+  concordance_direction: "same"     # Both UP or both DOWN
+  min_abs_log2fc: 0.5              # Minimum |log2FC| in both diseases
+  drug_sensitivity_threshold: 0.50  # Minimum sensitivity to report
+
+# ── VISUALIZATION ─────────────────────────────────────────────
+viz:
+  dpi: 300
+  figure_format: "png"
+  color_palette:
+    upregulated: "#E74C3C"
+    downregulated: "#3498DB"
+    ad_primary: "#8E44AD"
+    t2d_primary: "#E67E22"
+    shared: "#27AE60"
+    background: "#1A1A2E"
+
+# ── PATHS ─────────────────────────────────────────────────────
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  external: "data/external"
+  results: "results"
+  figures: "results/figures"
+  tables: "results/tables"
+  models: "results/models"
+  mlflow_uri: "mlruns/"

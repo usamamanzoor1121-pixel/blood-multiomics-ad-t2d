@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.env
+data/raw/*
+data/processed/*
+mlruns/
+*.log
+.DS_Store
