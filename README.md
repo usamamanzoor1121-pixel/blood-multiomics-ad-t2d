@@ -19,7 +19,7 @@ This repository contains the complete, reproducible bioinformatics pipeline for 
 
 **"Blood-Based Multi-Omics Analysis of Alzheimer's Disease and Type 2 Diabetes: Shared Immune Signatures, Novel Blood Biomarkers, and a Cross-Disease Drug Repurposing Framework"**
 
-*Usama Manzoor¹, Syed Muhammad Iqbal Azimuddin¹*
+*Usama Manzoor¹*
 *¹Department of Biosciences, MAJU Karachi, Pakistan*
 
 ### Why Whole Blood?
