@@ -1,0 +1,6 @@
+model,cv_auc_mean,cv_auc_std,test_auc,test_acc
+Random Forest,0.7299,0.0358,0.7724,0.6056
+Gradient Boosting,0.7137,0.0264,0.7676,0.5563
+SVM (RBF),0.7122,0.0227,0.7439,0.5493
+MLP,0.7413,0.0206,0.7085,0.5493
+LASSO Logistic,0.6789,0.0192,0.6908,0.4859
