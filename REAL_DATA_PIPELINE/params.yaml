@@ -1,0 +1,46 @@
+paths:
+  raw_data:        "data/raw"
+  processed_data:  "data/processed"
+  figures:         "data/figures"
+  tables:          "data/tables"
+  models:          "models"
+  mlflow_uri:      "mlruns"
+
+deg:
+  min_counts:       10
+  padj_threshold:   0.05
+  log2fc_threshold: 0.30
+
+ml:
+  random_state: 42
+  cv_folds:     5
+  test_size:    0.20
+  n_top_genes:  500
+  shap:
+    enabled:      true
+    n_background: 100
+    max_display:  20
+  hyperparams:
+    random_forest:
+      n_estimators:    300
+      min_samples_leaf: 2
+    gradient_boosting:
+      n_estimators:  200
+      learning_rate: 0.05
+      max_depth:     4
+      subsample:     0.8
+    svm_rbf:
+      C: 1.0
+    mlp:
+      hidden_layers: [256, 128, 64]
+      epochs:        300
+
+births:
+  stress_genes:   ["S100A8","S100A9","TXNIP","IL1B","NLRP3","CCL2"]
+  protect_genes:  ["IRS1","PPARGC1A","ADIPOR1","IL10","FOXO1","TFAM"]
+  validation_split: 0.30
+
+brs_t:
+  up_genes:   ["C1QB","C1QC","S100A8","S100A9","PF4","MX1","OAS1","TXNIP","IL1B"]
+  down_genes: ["CD3D","CD3E","PRF1","NKG7","GZMK","IRS1","PPARGC1A"]
+  validation_split: 0.30

@@ -1,3 +1,10 @@
+# ============================================================================
+# WARNING (added 2026-09-24 audit): This script generates data via np.random
+# simulation and NEVER loads the real GEO accessions it references in comments.
+# It does not reflect real biological results. See ../REAL_DATA_PIPELINE/ for the
+# corrected pipeline that actually downloads and analyses real GEO data, and
+# ../FINAL_RESEARCH_AUDIT_REPORT.md for the full audit.
+# ============================================================================
 """
 ML runner v3 — AD fold-changes adjusted to published range
 S100A8/S100A9/C1QB in blood AD: 0.8-1.2 log2FC (Lunnon et al 2012, AddNeuroMed)
