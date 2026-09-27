@@ -61,11 +61,12 @@ def preprocess_t2d_rnaseq() -> tuple[pd.DataFrame, pd.DataFrame]:
     meta_path = RAW_DIR / "t2d" / "GSE221521" / "GSE221521_metadata.csv"
 
     if not expr_path.exists():
-        log.warning(f"Raw data not found at {expr_path}. Generating simulated data.")
-        expr_df, meta_df = _simulate_t2d_data()
-    else:
-        expr_df = pd.read_csv(expr_path, index_col=0)
-        meta_df = pd.read_csv(meta_path, index_col=0)
+        raise FileNotFoundError(
+            f"Raw GSE221521 data not found at {expr_path}. Run the download/parse "
+            f"scripts first (00_download_real_data.py, 00b_parse_downloaded_data.py)."
+        )
+    expr_df = pd.read_csv(expr_path, index_col=0)
+    meta_df = pd.read_csv(meta_path, index_col=0)
 
     log.info(f"  Raw shape: {expr_df.shape}")
 
@@ -113,12 +114,13 @@ def preprocess_ad_microarray() -> tuple[pd.DataFrame, pd.DataFrame]:
         meta_path = RAW_DIR / "ad" / accession / f"{accession}_metadata.csv"
 
         if not expr_path.exists():
-            log.warning(f"  {accession} not found — using simulated data")
-            expr, meta = _simulate_ad_data(accession, batch_id)
-        else:
-            expr = pd.read_csv(expr_path, index_col=0)
-            meta = pd.read_csv(meta_path, index_col=0)
-            meta["batch"] = batch_id
+            raise FileNotFoundError(
+                f"Raw {accession} data not found at {expr_path}. Run the download/parse "
+                f"scripts first (00_download_real_data.py, 00b_parse_downloaded_data.py)."
+            )
+        expr = pd.read_csv(expr_path, index_col=0)
+        meta = pd.read_csv(meta_path, index_col=0)
+        meta["batch"] = batch_id
 
         dfs.append(expr)
         metas.append(meta)
@@ -270,182 +272,6 @@ def _plot_sample_distribution(df: pd.DataFrame,
     plt.savefig(outpath, dpi=150, bbox_inches="tight", facecolor="#1A1A2E")
     plt.close()
     log.info(f"  QC plot saved: {outpath.name}")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Simulation (used when raw GEO data is not downloaded)
-# ─────────────────────────────────────────────────────────────────────────────
-def _simulate_t2d_data() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Generate biologically parameterised T2DM simulation.
-
-    SIMULATION FIX (v2): Fold-changes are set to realistic published values
-    from whole-blood T2DM studies (Mootha et al., Seo et al., GSE221521).
-    Original values (3.5x-4.0x log2FC) were unrealistically large and produced
-    AUC=1.0 even without data leakage. Real whole-blood signals are 0.3-0.8
-    log2FC with substantial inter-individual variation.
-    Per-sample noise is also increased to reflect biological heterogeneity.
-    """
-    np.random.seed(42)
-    n_t2d, n_pre, n_ctrl = 509, 180, 501
-    n_total  = n_t2d + n_pre + n_ctrl
-    n_genes  = 18_000
-    gene_ids = [f"GENE_{i:05d}" for i in range(n_genes)]
-
-    # Baseline expression with realistic inter-individual noise
-    baseline = np.random.negative_binomial(20, 0.5, size=(n_genes, n_total)).astype(float)
-    # Add per-sample random effects (biological heterogeneity)
-    sample_effects = np.random.normal(0, 0.15, size=(1, n_total))
-    baseline = baseline * (1 + sample_effects)
-
-    # Realistic fold-changes from published whole-blood T2DM literature
-    # (GSE221521, Mootha et al. 2003, Seo et al. 2017) — typical 0.3-0.8 log2FC
-    up_genes = {
-        "S100A8":   0.75,   # monocyte activation marker
-        "S100A9":   0.68,   # monocyte activation marker
-        "TXNIP":    0.80,   # glucose-induced thioredoxin interacting protein
-        "IL1B":     0.62,   # NLRP3 inflammasome output
-        "NLRP3":    0.55,   # inflammasome sensor
-        "CCL2":     0.48,   # monocyte chemotaxis
-        "MPO":      0.42,   # neutrophil oxidative burst
-        "FASN":     0.38,   # fatty acid synthesis
-        "MMP9":     0.35,   # matrix metalloproteinase
-        "STAT3":    0.32,   # JAK-STAT signalling
-    }
-    down_genes = {
-        "IRS1":     -0.70,  # insulin receptor substrate
-        "PPARGC1A": -0.75,  # mitochondrial biogenesis master regulator
-        "ADIPOR1":  -0.55,  # adiponectin receptor
-        "IL10":     -0.48,  # anti-inflammatory cytokine
-        "FOXO1":    -0.45,  # forkhead transcription factor
-        "TFAM":     -0.40,  # mitochondrial transcription factor
-        "CD3D":     -0.50,  # T-cell receptor complex
-        "PRF1":     -0.38,  # perforin (NK/T-cell)
-    }
-
-    for g, fc in {**up_genes, **down_genes}.items():
-        if g in gene_ids:
-            idx = gene_ids.index(g)
-        else:
-            gene_ids[list(up_genes.keys()).index(g) if g in up_genes else
-                     n_genes - list(down_genes.keys()).index(g) - 1] = g
-            idx = gene_ids.index(g)
-
-        t2d_start = 0
-        t2d_end   = n_t2d
-        # Apply fold-change with per-sample noise (not all patients show equal signal)
-        noise_t2d = np.random.normal(0, abs(fc) * 0.4, n_t2d)
-        noise_pre = np.random.normal(0, abs(fc) * 0.4, n_pre)
-        if fc > 0:
-            baseline[idx, t2d_start:t2d_end] *= (2 ** (fc + noise_t2d))
-            baseline[idx, t2d_end:t2d_end + n_pre] *= (2 ** (fc * 0.5 + noise_pre))
-        else:
-            baseline[idx, t2d_start:t2d_end] /= (2 ** (abs(fc) + noise_t2d))
-            baseline[idx, t2d_end:t2d_end + n_pre] /= (2 ** (abs(fc) * 0.5 + noise_pre))
-
-    expr_df = pd.DataFrame(
-        baseline,
-        index=gene_ids,
-        columns=[f"T2D_{i:04d}" for i in range(n_t2d)] +
-                [f"PRE_{i:04d}" for i in range(n_pre)] +
-                [f"CTRL_{i:04d}" for i in range(n_ctrl)]
-    )
-
-    diagnoses = (["T2D"] * n_t2d + ["Pre-DM"] * n_pre + ["Control"] * n_ctrl)
-    hba1c     = ([np.random.uniform(7.0, 12.0) for _ in range(n_t2d)] +
-                 [np.random.uniform(5.7, 6.4)  for _ in range(n_pre)] +
-                 [np.random.uniform(4.5, 5.6)  for _ in range(n_ctrl)])
-
-    meta_df = pd.DataFrame({
-        "diagnosis": diagnoses,
-        "HbA1c":     hba1c,
-        "batch":     [1] * n_total
-    }, index=expr_df.columns)
-
-    return expr_df, meta_df
-
-
-def _simulate_ad_data(accession: str, batch_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Generate biologically parameterised AD simulation.
-
-    SIMULATION FIX (v2): Fold-changes reduced to realistic whole-blood values
-    from AddNeuroMed (GSE63060/61) and related studies. Blood-based AD signals
-    are weaker than brain tissue signals — typical 0.25-0.65 log2FC with high
-    inter-individual variation. Original values (1.8-2.8 log2FC) reflected
-    brain tissue effect sizes, not blood, and produced unrealistic AUC=1.0.
-    """
-    np.random.seed(42 + batch_id)
-    n_ad, n_mci, n_ctrl = 144, 119, 197
-    n_total  = n_ad + n_mci + n_ctrl
-    n_genes  = 22_000
-    gene_ids = [f"PROBE_{i:05d}" for i in range(n_genes)]
-
-    # Realistic baseline noise for microarray (already log2-transformed)
-    baseline = np.random.normal(8.0, 1.5, size=(n_genes, n_total))
-    # Add per-sample effects (batch and biological)
-    sample_effects = np.random.normal(0, 0.2, size=(1, n_total))
-    baseline = baseline + sample_effects
-
-    # Realistic blood-based AD fold-changes from AddNeuroMed literature
-    # (Lunnon et al. 2012, Fehlbaum-Beurdeley et al. 2012, GSE63060/61)
-    up_genes = {
-        "S100A8":  0.65,   # peripheral immune activation
-        "S100A9":  0.58,   # peripheral immune activation
-        "C1QB":    0.60,   # complement activation in blood
-        "C1QC":    0.55,   # complement activation
-        "PF4":     0.50,   # platelet factor, elevated in AD blood
-        "MX1":     0.52,   # interferon response
-        "OAS1":    0.45,   # innate immune response
-        "TXNIP":   0.40,   # oxidative stress marker
-        "IL1B":    0.48,   # neuroinflammation spillover
-    }
-    down_genes = {
-        "CD3D":     -0.60,  # T-cell exhaustion in AD blood
-        "CD3E":     -0.52,  # T-cell receptor complex
-        "PRF1":     -0.48,  # NK/cytotoxic T-cell function
-        "NKG7":     -0.42,  # NK cell granule protein
-        "IRS1":     -0.38,  # insulin signalling (AD-T2D overlap)
-        "PPARGC1A": -0.45,  # mitochondrial dysfunction marker
-        "ADIPOR1":  -0.32,  # adiponectin signalling
-    }
-
-    for g, fc in {**up_genes, **down_genes}.items():
-        if g not in gene_ids:
-            probe_idx = list(up_genes.keys()).index(g) if g in up_genes else \
-                        n_genes - list(down_genes.keys()).index(g) - 1
-            gene_ids[probe_idx] = g
-
-        idx = gene_ids.index(g)
-        # Add per-sample noise to fold-change (not all AD patients show equal signal)
-        noise_ad  = np.random.normal(0, abs(fc) * 0.45, n_ad)
-        noise_mci = np.random.normal(0, abs(fc) * 0.45, n_mci)
-        if fc > 0:
-            baseline[idx, :n_ad]             += (fc + noise_ad)
-            baseline[idx, n_ad:n_ad + n_mci] += (fc * 0.5 + noise_mci)
-        else:
-            baseline[idx, :n_ad]             += (fc + noise_ad)
-            baseline[idx, n_ad:n_ad + n_mci] += (fc * 0.4 + noise_mci)
-
-    expr_df = pd.DataFrame(
-        baseline,
-        index=gene_ids,
-        columns=[f"{accession}_AD_{i:03d}"  for i in range(n_ad)] +
-                [f"{accession}_MCI_{i:03d}" for i in range(n_mci)] +
-                [f"{accession}_C_{i:03d}"   for i in range(n_ctrl)]
-    )
-
-    mmse_scores = ([np.random.uniform(10, 24) for _ in range(n_ad)] +
-                   [np.random.uniform(24, 27) for _ in range(n_mci)] +
-                   [np.random.uniform(27, 30) for _ in range(n_ctrl)])
-
-    meta_df = pd.DataFrame({
-        "diagnosis": ["AD"] * n_ad + ["MCI"] * n_mci + ["Control"] * n_ctrl,
-        "MMSE":      mmse_scores,
-        "batch":     [batch_id] * n_total
-    }, index=expr_df.columns)
-
-    return expr_df, meta_df
 
 
 # ─────────────────────────────────────────────────────────────────────────────

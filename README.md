@@ -7,7 +7,7 @@
 
 This repository contains the reproducible bioinformatics pipeline for a blood-based
 multi-omics reanalysis of Alzheimer's disease (AD) and Type 2 diabetes (T2DM), using
-real public whole-blood transcriptomic cohorts for each disease.
+public whole-blood transcriptomic cohorts for each disease.
 
 *Usama Manzoor¹*
 *¹Department of Biosciences, MAJU Karachi, Pakistan*
@@ -61,7 +61,7 @@ public metadata includes MMSE or HbA1c.
 ```
 blood-multiomics-ad-t2d/
 │
-├── REAL_DATA_PIPELINE/
+├── Blood_MultiOmics_Pipeline/
 │   ├── 00b_parse_downloaded_data.py #   Parses raw GEO downloads → analysis-ready CSVs
 │   ├── preprocess_blood.py          #   QC, size-factor normalisation, batch correction
 │   ├── 03_deg_analysis.py           #   Differential expression (Welch t-test + BH-FDR)
@@ -82,7 +82,7 @@ blood-multiomics-ad-t2d/
 
 ```bash
 git clone https://github.com/usamamanzoor1121-pixel/blood-multiomics-ad-t2d.git
-cd blood-multiomics-ad-t2d/REAL_DATA_PIPELINE
+cd blood-multiomics-ad-t2d/Blood_MultiOmics_Pipeline
 
 pip install pandas numpy scipy scikit-learn statsmodels joblib matplotlib seaborn \
             pyyaml shap mlflow
@@ -178,7 +178,7 @@ a result.
 
 ## 🔄 Reproducibility
 
-All parameters are centralised in `REAL_DATA_PIPELINE/params.yaml`.
+All parameters are centralised in `Blood_MultiOmics_Pipeline/params.yaml`.
 
 ---
 
@@ -187,7 +187,7 @@ All parameters are centralised in `REAL_DATA_PIPELINE/params.yaml`.
 ```bibtex
 @article{manzoor2026blood,
   title   = {Blood-Based Multi-Omics Analysis of Alzheimer's Disease and Type 2 Diabetes:
-             A Real-Data Reassessment of Shared Immune Signatures and Candidate Blood Biomarkers},
+             A Reassessment of Shared Immune Signatures and Candidate Blood Biomarkers},
   author  = {Manzoor, Usama and Azimuddin, Syed Muhammad Iqbal},
   journal = {Manuscript in Preparation},
   year    = {2026},

@@ -2,14 +2,14 @@
 """
 05_generate_figures.py
 ========================
-Publication-style figures for the real-data AD x T2D blood multi-omics
+Publication-style figures for the AD x T2D blood multi-omics
 reanalysis, using the same validated colorblind-safe palette as the T2D
 lncRNA project (references/palette.md in the dataviz skill).
 
 New figures (existing ROC/SHAP/QC figures from the ML/preprocessing scripts
 are reused as-is, not regenerated):
-  FigA_AD_volcano.png         AD DEG volcano plot (real signal, 4,743 sig genes)
-  FigB_T2D_volcano.png        T2D DEG volcano plot (real null result, 0 sig genes)
+  FigA_AD_volcano.png         AD DEG volcano plot (4,743 sig genes)
+  FigB_T2D_volcano.png        T2D DEG volcano plot (null result, 0 sig genes)
   FigC_BRS_T_distribution.png BRS-T (transcriptomic) score by diagnosis
   FigD_BIRTHS_distribution.png BIRTHS score by diagnosis
   FigE_ML_performance.png     AD vs T2D test AUC across all 5 models
@@ -135,7 +135,7 @@ def ml_performance():
     ax.set_xticklabels(models, rotation=20, ha="right", fontsize=9)
     ax.set_ylabel("Test AUC")
     ax.set_ylim(0, 1.0)
-    ax.set_title("Real-data ML classification: AD outperforms T2D\n(contrary to the original simulated-data narrative)",
+    ax.set_title("ML classification: AD outperforms T2D",
                   fontsize=12, fontweight="bold", loc="left", pad=12)
     ax.spines[["top", "right"]].set_visible(False)
     ax.legend(frameon=False, loc="upper left", fontsize=10)
@@ -146,9 +146,9 @@ def ml_performance():
 
 
 if __name__ == "__main__":
-    volcano(TAB / "ad_deg_results.csv", "AD blood DEG volcano plot (real GSE63060+61 data)",
+    volcano(TAB / "ad_deg_results.csv", "AD blood DEG volcano plot (GSE63060+61 data)",
             "FigA_AD_volcano.png")
-    volcano(TAB / "t2d_deg_results.csv", "T2D blood DEG volcano plot (real GSE221521 data)",
+    volcano(TAB / "t2d_deg_results.csv", "T2D blood DEG volcano plot (GSE221521 data)",
             "FigB_T2D_volcano.png")
     score_distribution(TAB / "brs_t_scores_real.csv", "BRS_T", ["Control", "MCI", "AD"],
                         [BLUE, AQUA, ORANGE],
@@ -156,7 +156,7 @@ if __name__ == "__main__":
                         "FigC_BRS_T_distribution.png")
     score_distribution(TAB / "births_scores_real.csv", "BIRTHS", ["Control", "PreDM", "T2D"],
                         [BLUE, AQUA, ORANGE],
-                        "BIRTHS score by diagnosis — real, modest, significant\n(Kruskal-Wallis p=0.008)",
+                        "BIRTHS score by diagnosis — modest, significant\n(Kruskal-Wallis p=0.008)",
                         "FigD_BIRTHS_distribution.png")
     ml_performance()
     log.info("All figures generated in data/figures/analysis/")

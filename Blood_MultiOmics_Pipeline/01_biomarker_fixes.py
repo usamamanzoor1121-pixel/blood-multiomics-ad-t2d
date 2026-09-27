@@ -6,7 +6,7 @@ Fixes for Issues 3 and 4:
 
 Issue 3 — BRS depends on plasma proteins (NfL, GFAP, p-tau217) not in GSE63060/61
 Fix: Reconstruct BRS using transcriptomics-only features from AddNeuroMed
-     (C1QB, S100A8, CD3D, PRF1, MX1, PF4 — top DEGs from real microarray data)
+     (C1QB, S100A8, CD3D, PRF1, MX1, PF4 — top DEGs from microarray data)
      Report as BRS-T (transcriptomic only), distinct from BRS-P (plasma protein composite)
 
 Issue 4 — Drug sensitivity scores have no documented methodology
@@ -86,7 +86,7 @@ def compute_brs_transcriptomic():
     log.info(f"  DOWN genes found: {len(present_down)}/{len(down_genes)}: {present_down}")
 
     if len(present_up) < 2 or len(present_down) < 2:
-        log.warning("  Insufficient BRS-T genes found in real data")
+        log.warning("  Insufficient BRS-T genes found in data")
         log.warning("  This means probe IDs in microarray don't match gene symbols")
         log.warning("  Need probe → gene symbol mapping from GPL annotation")
         log.warning("  See: _map_probes_to_symbols() below")
@@ -386,15 +386,15 @@ def prepare_binary_ad_data():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ISSUE 6 FIX: Cross-disease concordance on real data
+# Cross-disease concordance
 # ══════════════════════════════════════════════════════════════════════════════
-def compute_real_crossdisease_concordance():
+def compute_crossdisease_concordance():
     """
-    Issue 6: Compute AD × T2D fold-change concordance on real DEG results.
+    Compute AD × T2D fold-change concordance from DEG results.
     Requires DESeq2/limma results files from actual data.
     """
     log.info("=" * 60)
-    log.info("Cross-Disease Concordance — Real Data")
+    log.info("Cross-Disease Concordance")
     log.info("=" * 60)
 
     t2d_deg = Path("data/tables/t2d_deg_results.csv")
@@ -432,8 +432,7 @@ def compute_real_crossdisease_concordance():
     log.info(f"\n  Concordant direction: {concordant.sum()}/{len(concordant)} "
              f"({concordant.mean()*100:.0f}%)")
     log.info(f"  Spearman r = {r:.3f}, p = {p:.4f}")
-    log.info(f"  (Original paper claimed r=0.89 on simulated data)")
-    log.info(f"  This is the REAL concordance to report in the manuscript")
+    log.info(f"  Cross-disease concordance to report in the manuscript")
 
     shared_df = pd.DataFrame({
         "gene":          shared,
@@ -462,9 +461,9 @@ if __name__ == "__main__":
     prepare_binary_ad_data()
 
     log.info("\n[Issue 6] Cross-Disease Concordance")
-    compute_real_crossdisease_concordance()
+    compute_crossdisease_concordance()
 
     log.info("\n" + "=" * 60)
     log.info("All fixes complete.")
-    log.info("Next: update manuscript with real data results")
+    log.info("Next: update manuscript with results")
     log.info("=" * 60)

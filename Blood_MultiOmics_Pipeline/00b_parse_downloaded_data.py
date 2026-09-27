@@ -202,4 +202,4 @@ if __name__ == "__main__":
     parse_t2d()
     parse_ad("GSE63060", "GPL6947.annot.gz")
     parse_ad("GSE63061", "GPL10558.annot.gz")
-    log.info("\nAll real GEO data parsed successfully.")
+    log.info("\nAll GEO data parsed successfully.")

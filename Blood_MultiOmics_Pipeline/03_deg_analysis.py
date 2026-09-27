@@ -2,12 +2,12 @@
 """
 03_deg_analysis.py
 ===================
-Differential expression on the REAL preprocessed blood data, per disease.
+Differential expression on preprocessed blood data, per disease.
 T2D: T2D vs Control (Welch t-test on log2 VST-proxy values, BH-FDR).
 AD:  AD vs Control (Welch t-test on log2 quantile-normalised/batch-corrected
      microarray values, BH-FDR).
 
-Outputs (feed compute_real_crossdisease_concordance() in 01_biomarker_fixes.py):
+Outputs (feed compute_crossdisease_concordance() in 01_biomarker_fixes.py):
     data/tables/t2d_deg_results.csv   (gene, log2FC, pvalue, padj)
     data/tables/ad_deg_results.csv    (gene, log2FC, pvalue, padj)
 """
