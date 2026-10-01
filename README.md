@@ -9,8 +9,10 @@ This repository contains the reproducible bioinformatics pipeline for a blood-ba
 multi-omics reanalysis of Alzheimer's disease (AD) and Type 2 diabetes (T2DM), using
 public whole-blood transcriptomic cohorts for each disease.
 
-*Usama Manzoor¹*
-*¹Department of Biosciences, MAJU Karachi, Pakistan*
+*Usama Manzoor¹, Yulia Medvedeva²\**
+*¹Jinnah Sindh Medical University, Karachi, Pakistan*
+*²Mohamed bin Zayed University of Artificial Intelligence (MBZUAI), Abu Dhabi, UAE*
+*\*Corresponding author*
 
 ### Why Whole Blood?
 
@@ -188,21 +190,25 @@ All parameters are centralised in `Blood_MultiOmics_Pipeline/params.yaml`.
 @article{manzoor2026blood,
   title   = {Blood-Based Multi-Omics Analysis of Alzheimer's Disease and Type 2 Diabetes:
              A Reassessment of Shared Immune Signatures and Candidate Blood Biomarkers},
-  author  = {Manzoor, Usama and Azimuddin, Syed Muhammad Iqbal},
+  author  = {Manzoor, Usama and Medvedeva, Yulia},
   journal = {Manuscript in Preparation},
   year    = {2026},
-  institution = {Mohammad Ali Jinnah University, Karachi, Pakistan}
+  institution = {Jinnah Sindh Medical University, Karachi, Pakistan; Mohamed bin Zayed University of Artificial Intelligence (MBZUAI), Abu Dhabi, UAE}
 }
 ```
 
 ---
 
-## 👤 Author
+## 👤 Authors
 
 **Usama Manzoor**
-Bioinformatics Specialist · JSMU Diagnostic Laboratory · Karachi, Pakistan
+Jinnah Sindh Medical University, Karachi, Pakistan
 📧 usama.manzoor1121@gmail.com
 🐙 [@usamamanzoor1121-pixel](https://github.com/usamamanzoor1121-pixel)
+
+**Yulia Medvedeva** (Corresponding author)
+Mohamed bin Zayed University of Artificial Intelligence (MBZUAI), Abu Dhabi, UAE
+📧 Yu.Medvedeva@mbzuai.ac.ae
 
 ---
 
