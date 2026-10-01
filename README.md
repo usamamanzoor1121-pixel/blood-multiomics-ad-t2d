@@ -71,7 +71,6 @@ blood-multiomics-ad-t2d/
 │   ├── 01_biomarker_fixes.py        #   BRS-T, BIRTHS, HGERS, cross-disease concordance
 │   ├── 05_generate_figures.py       #   Publication figures (volcano, biomarkers, ML)
 │   ├── params.yaml                  #   All analysis parameters
-│   ├── Blood_MultiOmics_AD_T2D_Manuscript_CORRECTED.docx
 │   └── data/{tables,figures}/       #   DEG tables, ML results, ROC curves, SHAP plots
 │
 ├── README.md
